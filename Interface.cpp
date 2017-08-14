@@ -26,13 +26,13 @@
 
 //-----------------------------------------------------------------------------
 void error (void) {
-	digitalWrite( errorPin, HIGH );
+	digitalWrite( ERROR_PIN, HIGH );
 	delay( 500 );
-	digitalWrite( errorPin, LOW );
+	digitalWrite( ERROR_PIN, LOW );
 	delay( 250 );
-	digitalWrite( errorPin, HIGH );
+	digitalWrite( ERROR_PIN, HIGH );
 	delay( 500 );
-	digitalWrite( errorPin, LOW );
+	digitalWrite( ERROR_PIN, LOW );
 }
 
 //-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ void error (void) {
 //-----------------------------------------------------------------------------
 // Fills the given buffer with bufferSize chars from a Serial object
 
-void fillBuffer( char *buffer, byte bufferSize, HardwareSerial::HardwareSerial* serial )
+void fillBuffer( char *buffer, byte bufferSize, Stream* serial )
 {
 	// Clean buffer
 	memset( (void *)buffer, '\0', sizeof(char) * bufferSize );
@@ -66,7 +66,7 @@ void fillBuffer( char *buffer, byte bufferSize, HardwareSerial::HardwareSerial* 
 void printStatus( void )
 {
 	Serial.print("Buffer size: ");
-	Serial.println(ADCBUFFERSIZE);
+	Serial.println(ADC_BUFFER_SIZE);
 	Serial.print("Baud rate: ");
 	Serial.println(BAUDRATE);
 	Serial.print("Wait duration: ");

@@ -35,7 +35,7 @@ ISR(ADC_vect)
 	// Otherwise, ADCL must be read first, then ADCH.
 	ADCBuffer[ADCCounter] = ADCH;
 
-	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
+	ADCCounter = ( ADCCounter + 1 ) % ADC_BUFFER_SIZE;
 
 	if ( wait )
 	{
@@ -59,9 +59,9 @@ ISR(ANALOG_COMP_vect)
 	cbi( ACSR,ACIE );
 
 	// Turn on errorPin
-	//digitalWrite( errorPin, HIGH );
-	sbi( PORTB, PORTB5 );
+	digitalWrite( ERROR_PIN, HIGH );
+	///sbi( PORTB, PORTB5 );
 
 	wait = true;
-	stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+	stopIndex = ( ADCCounter + waitDuration ) % ADC_BUFFER_SIZE;
 }

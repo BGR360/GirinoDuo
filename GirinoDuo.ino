@@ -36,14 +36,14 @@ volatile  boolean wait;
          uint16_t waitDuration;
 volatile uint16_t stopIndex;
 volatile uint16_t ADCCounter;
-volatile  uint8_t ADCBuffer[ADCBUFFERSIZE];
+volatile  uint8_t ADCBuffer[ADC_BUFFER_SIZE];
 volatile  boolean freeze;
 
           uint8_t prescaler;
           uint8_t triggerEvent;
           uint8_t threshold;
 
-             char commandBuffer[COMBUFFERSIZE+1];
+             char commandBuffer[COM_BUFFER_SIZE+1];
 
 //-----------------------------------------------------------------------------
 // Main routines
@@ -61,7 +61,7 @@ void setup (void) {		// Setup of the microcontroller
 	memset( (void *)commandBuffer, 0, sizeof(commandBuffer) );
 	ADCCounter = 0;
 	wait = false;
-	waitDuration = ADCBUFFERSIZE - 32;
+	waitDuration = ADC_BUFFER_SIZE - 32;
 	stopIndex = -1;
 	freeze = false;
 
@@ -100,12 +100,12 @@ void loop (void) {
 		//Serial.print("Buffer: ");
 		//Serial.write( ADCBuffer, ADCBUFFERSIZE );
 		//Serial.print("End of Buffer");
-		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
+		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADC_BUFFER_SIZE - ADCCounter );
 		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
 
 		// Turn off errorPin
-		//digitalWrite( errorPin, LOW );
-		cbi(PORTB,PORTB5);
+		digitalWrite( ERROR_PIN, LOW );
+		///cbi(PORTB,PORTB5);
 
 		wait = false;
 		freeze = false;
@@ -147,9 +147,9 @@ void loop (void) {
 			case 'p':			// 'p' for new prescaler setting
 			case 'P': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
-				delay(COMMANDDELAY);
+				delay(COMMAND_DELAY);
 
-				fillBuffer( commandBuffer, COMBUFFERSIZE );
+				fillBuffer( commandBuffer, COM_BUFFER_SIZE );
 
 				// Convert buffer to integer
 				uint8_t newP = atoi( commandBuffer );
@@ -166,9 +166,9 @@ void loop (void) {
 			case 'r':			// 'r' for new voltage reference setting
 			case 'R': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
-				delay(COMMANDDELAY);
+				delay(COMMAND_DELAY);
 
-				fillBuffer( commandBuffer, COMBUFFERSIZE );
+				fillBuffer( commandBuffer, COM_BUFFER_SIZE );
 
 				// Convert buffer to integer
 				uint8_t newR = atoi( commandBuffer );
@@ -184,9 +184,9 @@ void loop (void) {
 			case 'e':			// 'e' for new trigger event setting
 			case 'E': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
-				delay(COMMANDDELAY);
+				delay(COMMAND_DELAY);
 
-				fillBuffer( commandBuffer, COMBUFFERSIZE );
+				fillBuffer( commandBuffer, COM_BUFFER_SIZE );
 
 				// Convert buffer to integer
 				uint8_t newE = atoi( commandBuffer );
@@ -203,9 +203,9 @@ void loop (void) {
 			case 'w':			// 'w' for new wait setting
 			case 'W': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
-				delay(COMMANDDELAY);
+				delay(COMMAND_DELAY);
 
-				fillBuffer( commandBuffer, COMBUFFERSIZE );
+				fillBuffer( commandBuffer, COM_BUFFER_SIZE );
 
 				// Convert buffer to integer
 				uint8_t newW = atoi( commandBuffer );
@@ -221,9 +221,9 @@ void loop (void) {
 			case 't':			// 'w' for new threshold setting
 			case 'T': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
-				delay(COMMANDDELAY);
+				delay(COMMAND_DELAY);
 
-				fillBuffer( commandBuffer, COMBUFFERSIZE );
+				fillBuffer( commandBuffer, COM_BUFFER_SIZE );
 
 				// Convert buffer to integer
 				uint8_t newT = atoi( commandBuffer );
@@ -233,7 +233,7 @@ void loop (void) {
 				Serial.println(newT);
 
 				threshold = newT;
-				analogWrite( thresholdPin, threshold );
+				analogWrite( THRESHOLD_PIN, threshold );
 				}
 				break;
 

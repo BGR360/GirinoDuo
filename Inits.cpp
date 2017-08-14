@@ -48,10 +48,19 @@ void initPins(void)
 	//			WGM22 = 1: Toggle OC2A on Compare Match.
 	//	1	0	Clear OC2A on Compare Match, set OC2A at BOTTOM
 	//	1	1	Clear OC2A on Compare Match, clear OC2A at BOTTOM
+#ifdef MEGA_328
 	cbi(TCCR2A,COM2A1);
 	cbi(TCCR2A,COM2A0);
 	sbi(TCCR2A,COM2B1);
 	cbi(TCCR2A,COM2B0);
+#endif
+  // The ATmega32u4 does not have a Timer 2. Use Timer 1 instead
+#ifdef MEGA_32U4
+  cbi(TCCR1A,COM1A1);
+  cbi(TCCR1A,COM1A0);
+  sbi(TCCR1A,COM1B1);
+  cbi(TCCR1A,COM1B0);
+#endif
 
 	// Combined with the WGM22 bit found in the TCCR2B Register, these bits
 	// control the counting sequence of the counter, the source for maximum
@@ -70,9 +79,17 @@ void initPins(void)
 	//	5	1	0	1	PWM		OCRA
 	//	6	1	1	0	Reserved	-
 	//	7	1	1	1	Fast PWM	OCRA
+#ifdef MEGA_328
 	cbi(TCCR2B,WGM22);
 	sbi(TCCR2A,WGM21);
 	sbi(TCCR2A,WGM20);
+#endif
+  // The ATmega32u4 does not have a Timer 2. Use Timer 1 instead
+#ifdef MEGA_32U4
+  cbi(TCCR1B,WGM12);
+  sbi(TCCR1A,WGM11);
+  sbi(TCCR1A,WGM10);
+#endif
 
 	//---------------------------------------------------------------------
 	// TCCR2B settings
@@ -90,8 +107,15 @@ void initPins(void)
 	// A FOC2A strobe will not generate any interrupt, nor will it clear
 	// the timer in CTC mode using OCR2A as TOP.
 	// The FOC2A bit is always read as zero.
+#ifdef MEGA_328
 	cbi(TCCR2B,FOC2A);
 	cbi(TCCR2B,FOC2B);
+#endif
+  // The ATmega32u4 does not have a Timer 2. Use Timer 1 instead
+#ifdef MEGA_32U4
+  cbi(TCCR1B,FOC1A);
+  cbi(TCCR1B,FOC1B);
+#endif
 
 	// The three Clock Select bits select the clock source to be used by
 	// the Timer/Counter.
@@ -104,14 +128,22 @@ void initPins(void)
 	//	1	0	1	128
 	//	1	1	0	256
 	//	1	1	1	1024
+#ifdef MEGA_328
 	cbi(TCCR2B,CS22);
 	cbi(TCCR2B,CS21);
 	sbi(TCCR2B,CS20);
+#endif
+  // The ATmega32u4 does not have a Timer 2. Use Timer 1 instead
+#ifdef MEGA_32U4
+  cbi(TCCR1B,CS12);
+  cbi(TCCR1B,CS11);
+  sbi(TCCR1B,CS10);
+#endif
 
-	pinMode( errorPin, OUTPUT );
-	pinMode( thresholdPin, OUTPUT );
+	pinMode( ERROR_PIN, OUTPUT );
+	pinMode( THRESHOLD_PIN, OUTPUT );
 
-	analogWrite( thresholdPin, 127 );
+	analogWrite( THRESHOLD_PIN, 127 );
 }
   
 //-----------------------------------------------------------------------------
@@ -145,7 +177,7 @@ void initADC(void)
 	// the ADC. If these bits are changed during a conversion, the change
 	// will not go in effect until this conversion is complete (ADIF in
 	// ADCSRA is set).
-	ADMUX |= ( ADCPIN & 0x07 );
+	ADMUX |= ( ADC_PIN & 0x07 );
 
 	//---------------------------------------------------------------------
 	// ADCSRA settings

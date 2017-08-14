@@ -30,15 +30,15 @@
 
 #define DEBUG		0
 
-#define ADCBUFFERSIZE	1280
+#define ADC_BUFFER_SIZE	1280
 
-#define ADCPIN		0
-#define errorPin	13
-#define thresholdPin	3
+#define ADC_PIN			0
+#define ERROR_PIN		13
+#define THRESHOLD_PIN	3
 
 #define BAUDRATE	115200	// Baud rate of UART in bps
-#define COMMANDDELAY	10	// ms to wait for the filling of Serial buffer
-#define COMBUFFERSIZE	3	// Size of buffer for incoming numbers
+#define COMMAND_DELAY	10	// ms to wait for the filling of Serial buffer
+#define COM_BUFFER_SIZE	3	// Size of buffer for incoming numbers
 
 #if DEBUG == 1
 	#define dprint(expression) Serial.print("# "); Serial.print( #expression ); Serial.print( ": " ); Serial.println( expression )
@@ -54,6 +54,17 @@
 #endif
 #ifndef sbi
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
+
+// Defines for board type
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#define MEGA_1280
+#endif
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+#define MEGA_328
+#endif
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+#define MEGA_32U4
 #endif
 
 //-----------------------------------------------------------------------------
@@ -81,7 +92,7 @@ void error (void);
 void fillBuffer( \
 	char *buffer, \
 	byte bufferSize, \
-	HardwareSerial::HardwareSerial* serial = &Serial );
+	Stream* serial = &Serial );
 void printStatus(void);
 
 //-----------------------------------------------------------------------------
@@ -91,12 +102,12 @@ extern volatile  boolean wait;
 extern          uint16_t waitDuration;
 extern volatile uint16_t stopIndex;
 extern volatile uint16_t ADCCounter;
-extern volatile  uint8_t ADCBuffer[ADCBUFFERSIZE];
+extern volatile  uint8_t ADCBuffer[ADC_BUFFER_SIZE];
 extern volatile  boolean freeze;
 
 extern           uint8_t prescaler;
 extern           uint8_t triggerEvent;
 extern           uint8_t threshold;
 
-extern              char commandBuffer[COMBUFFERSIZE+1];
+extern              char commandBuffer[COM_BUFFER_SIZE+1];
 
