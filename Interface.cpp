@@ -50,7 +50,7 @@ void info (int highOrLow) {
 //-----------------------------------------------------------------------------
 // fillBuffer
 //-----------------------------------------------------------------------------
-// Fills the given buffer with bufferSize chars from a Serial object
+// Fills the given buffer with bufferSize chars from Serial
 
 void fillBuffer( char *buffer, byte bufferSize, Stream* serial )
 {
@@ -66,16 +66,20 @@ void fillBuffer( char *buffer, byte bufferSize, Stream* serial )
 	dprint(limit);
 
 	// Fill buffer
-	for ( byte i = 0; i < limit; i++ ) {
+	for ( char *i = buffer; i < buffer + limit; i++ ) {
 		dprint(serial->available());
-		dprint(i);
+		dprint(i - buffer);
 		dprint(buffer);
 
-		buffer[i] = serial->read();
+		*i = serial->read();
 	}
 }
 
-void printStatus( void )
+//-----------------------------------------------------------------------------
+// printStatus
+//-----------------------------------------------------------------------------
+// Prints the status of the Girino to Serial
+void printStatus(void)
 {
 	Serial.print("Buffer size: ");
 	Serial.println(ADC_BUFFER_SIZE);
@@ -90,3 +94,149 @@ void printStatus( void )
 	Serial.print("Threshold: ");
 	Serial.println(threshold);
 }
+
+//-----------------------------------------------------------------------------
+// pollCommands
+//-----------------------------------------------------------------------------
+// Reads incoming Serial data from the computer to see if the computer has
+// sent any commands to the Girino. If it finds commands, it executes them
+void pollCommands(void) {
+  while (Serial.available()) {
+    // Read the command character
+    char command = Serial.read();
+    // Read the command arguments
+    fillBuffer(commandBuffer, COM_BUFFER_SIZE);
+    // Process the command
+    processCommand(command, commandBuffer);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// processCommand
+//-----------------------------------------------------------------------------
+// Based on the specified command character and command arguments, executes a
+// command
+void processCommand (char command, const char *args) {
+  switch (command) {
+    case 's':     // 's' for starting ADC conversions
+      //Serial.println("ADC conversions started");
+      
+      // Clear buffer
+      memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
+
+      startADC();
+      // Let the ADC fill the buffer a little bit
+      //delay(1);
+      startAnalogComparator();
+      break;
+    case 'S':     // 'S' for stopping ADC conversions
+      //Serial.println("ADC conversions stopped");
+      stopAnalogComparator();
+      stopADC();
+      break;
+    case 'p':     // 'p' for new prescaler setting
+    case 'P': {
+      // Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
+      delay(COMMAND_DELAY);
+
+      fillBuffer( commandBuffer, COM_BUFFER_SIZE );
+
+      // Convert buffer to integer
+      uint8_t newP = atoi( commandBuffer );
+
+      // Display moving status indicator
+      Serial.print("Setting prescaler to: ");
+      Serial.println(newP);
+
+      prescaler = newP;
+      setADCPrescaler(newP);
+      }
+      break;
+
+    case 'r':     // 'r' for new voltage reference setting
+    case 'R': {
+      // Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
+      delay(COMMAND_DELAY);
+
+      fillBuffer( commandBuffer, COM_BUFFER_SIZE );
+
+      // Convert buffer to integer
+      uint8_t newR = atoi( commandBuffer );
+
+      // Display moving status indicator
+      Serial.print("Setting voltage reference to: ");
+      Serial.println(newR);
+
+      setVoltageReference(newR);
+      }
+      break;
+
+    case 'e':     // 'e' for new trigger event setting
+    case 'E': {
+      // Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
+      delay(COMMAND_DELAY);
+
+      fillBuffer( commandBuffer, COM_BUFFER_SIZE );
+
+      // Convert buffer to integer
+      uint8_t newE = atoi( commandBuffer );
+
+      // Display moving status indicator
+      Serial.print("Setting trigger event to: ");
+      Serial.println(newE);
+
+      triggerEvent = newE;
+      setTriggerEvent(newE);
+      }
+      break;
+
+    case 'w':     // 'w' for new wait setting
+    case 'W': {
+      // Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
+      delay(COMMAND_DELAY);
+
+      fillBuffer( commandBuffer, COM_BUFFER_SIZE );
+
+      // Convert buffer to integer
+      uint8_t newW = atoi( commandBuffer );
+
+      // Display moving status indicator
+      Serial.print("Setting waitDuration to: ");
+      Serial.println(newW);
+
+      waitDuration = newW;
+      }
+      break;
+
+    case 't':     // 'w' for new threshold setting
+    case 'T': {
+      // Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
+      delay(COMMAND_DELAY);
+
+      fillBuffer( commandBuffer, COM_BUFFER_SIZE );
+
+      // Convert buffer to integer
+      uint8_t newT = atoi( commandBuffer );
+
+      // Display moving status indicator
+      Serial.print("Setting threshold to: ");
+      Serial.println(newT);
+
+      threshold = newT;
+      analogWrite( THRESHOLD_PIN, threshold );
+      }
+      break;
+
+    case 'd':     // 'd' for display status
+    case 'D':
+      printStatus();
+      break;
+
+    default:
+      // Display error message
+      Serial.print("ERROR: Command not found, it was: ");
+      Serial.println(command);
+      error();
+  }
+}
+

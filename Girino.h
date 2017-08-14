@@ -103,7 +103,10 @@ void setTriggerEvent( uint8_t event );
 
 void error (void);
 void info (int);
-// Fills the given buffer with bufferSize chars from a Serial object
+void pollCommands (void);
+void processCommand (
+  char command, 
+  const char *args );
 void fillBuffer( \
 	char *buffer, \
 	byte bufferSize, \
