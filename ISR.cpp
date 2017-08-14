@@ -58,9 +58,9 @@ ISR(ANALOG_COMP_vect)
 	// Disable Analog Comparator interrupt
 	cbi( ACSR,ACIE );
 
-	// Turn on errorPin
-	digitalWrite( ERROR_PIN, HIGH );
-	///sbi( PORTB, PORTB5 );
+	// Turn on infoPin
+	info(HIGH);
+	
 
 	wait = true;
 	stopIndex = ( ADCCounter + waitDuration ) % ADC_BUFFER_SIZE;

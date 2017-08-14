@@ -28,13 +28,38 @@
 // Defines and Typedefs
 //-----------------------------------------------------------------------------
 
+// Defines for board type
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#define MEGA_1280
+#endif
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+#define MEGA_328
+#endif
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+#define MEGA_32U4
+#endif
+
 #define DEBUG		0
 
 #define ADC_BUFFER_SIZE	1280
+#define ADC_PIN			    0
+#define ERROR_PIN       13
+#define THRESHOLD_PIN   3
 
-#define ADC_PIN			0
-#define ERROR_PIN		13
-#define THRESHOLD_PIN	3
+// To do fast digital writes on the info pin, 
+// we'll want to directly modify the registers.
+
+// On the ATmega328, pin 13 is PORTB5
+#if defined(MEGA_328)
+#define INFO_PIN_REG  PORTB
+#define INFO_PIN_MSK  PORTB5
+// On the ATmega32U4, pin 13 is PORTC7
+#elseif defined(MEGA_32U4)
+#define INFO_PIN_REG  PORTC
+#define INFO_PIN_MSK  PORTC7
+#else
+#define INFO_PIN      13
+#endif
 
 #define BAUDRATE	115200	// Baud rate of UART in bps
 #define COMMAND_DELAY	10	// ms to wait for the filling of Serial buffer
@@ -54,17 +79,6 @@
 #endif
 #ifndef sbi
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
-
-// Defines for board type
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#define MEGA_1280
-#endif
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
-#define MEGA_328
-#endif
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
-#define MEGA_32U4
 #endif
 
 //-----------------------------------------------------------------------------
@@ -88,6 +102,7 @@ void setVoltageReference( uint8_t reference );
 void setTriggerEvent( uint8_t event );
 
 void error (void);
+void info (int);
 // Fills the given buffer with bufferSize chars from a Serial object
 void fillBuffer( \
 	char *buffer, \

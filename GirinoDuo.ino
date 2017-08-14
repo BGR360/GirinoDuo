@@ -103,9 +103,8 @@ void loop (void) {
 		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADC_BUFFER_SIZE - ADCCounter );
 		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
 
-		// Turn off errorPin
-		digitalWrite( ERROR_PIN, LOW );
-		///cbi(PORTB,PORTB5);
+		// Turn off infoPin
+		info(LOW);
 
 		wait = false;
 		freeze = false;

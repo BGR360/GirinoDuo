@@ -35,6 +35,18 @@ void error (void) {
 	digitalWrite( ERROR_PIN, LOW );
 }
 
+void info (int highOrLow) {
+#if defined(INFO_PIN_REG) && defined(INFO_PIN_MSK)
+  if (highOrLow) {
+    sbi(INFO_PIN_REG, INFO_PIN_MSK);
+  } else {
+    cbi(INFO_PIN_REG, INFO_PIN_MSK);
+  }
+#else
+  digitalWrite( INFO_PIN, highOrLow );
+#endif
+}
+
 //-----------------------------------------------------------------------------
 // fillBuffer
 //-----------------------------------------------------------------------------
