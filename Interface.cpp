@@ -96,6 +96,18 @@ void printStatus(void)
 }
 
 //-----------------------------------------------------------------------------
+// sendWaveform
+//-----------------------------------------------------------------------------
+// Sends the contents of the ADCBuffer, in proper order, to the UI
+void sendWaveform (void) {
+  //Serial.print("Buffer: ");
+  //Serial.write( ADCBuffer, ADCBUFFERSIZE );
+  //Serial.print("End of Buffer");
+  Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADC_BUFFER_SIZE - ADCCounter );
+  Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
+}
+
+//-----------------------------------------------------------------------------
 // pollCommands
 //-----------------------------------------------------------------------------
 // Reads incoming Serial data from the computer to see if the computer has

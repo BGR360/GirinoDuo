@@ -96,12 +96,8 @@ void loop (void) {
 	{
 		dshow("# Frozen");
 
-		// Send buffer through serial port in the right order
-		//Serial.print("Buffer: ");
-		//Serial.write( ADCBuffer, ADCBUFFERSIZE );
-		//Serial.print("End of Buffer");
-		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADC_BUFFER_SIZE - ADCCounter );
-		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
+    // Send the waveform to the UI over the serial port
+    sendWaveform();
 
 		// Turn off infoPin
 		info(LOW);
@@ -112,10 +108,10 @@ void loop (void) {
 		// Clear buffer
 		//memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
 
-		//startADC();
+		startADC();
 		// Let the ADC fill the buffer a little bit
 		//delay(1);
-		//startAnalogComparator();
+		startAnalogComparator();
 
 		#if DEBUG == 1
 		delay(3000);

@@ -60,7 +60,6 @@ ISR(ANALOG_COMP_vect)
 
 	// Turn on infoPin
 	info(HIGH);
-	
 
 	wait = true;
 	stopIndex = ( ADCCounter + waitDuration ) % ADC_BUFFER_SIZE;
